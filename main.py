@@ -1,15 +1,14 @@
-import os
 import sqlite3
 
 
 def main():
-    conn = initDatabase()
+    conn = init_database()
 
     while True:
         menu(conn)
 
 def menu(conn):
-    clearConsole()
+    clear_console()
     print("[1] View tasks")
     print("[2] Add task")
     print("[3] Delete task")
@@ -18,22 +17,22 @@ def menu(conn):
     choice = input("> ").strip()
 
     if choice == "1":
-        listTasks(conn)
+        list_tasks(conn)
     elif choice == "2":
-        addTask(conn)
+        add_task(conn)
     elif choice == "3":
-        deleteTask(conn)
+        delete_task(conn)
     elif choice == "X":
         exit()
     else:
         print("Faulty choice")
 
 
-def addTask(conn):
-    clearConsole()
+def add_task(conn):
+    clear_console()
     print("Add a task")
-    taskInput = input()
-    task = (taskInput, 0)
+    task_input = input()
+    task = (task_input, 0)
 
     sql = """
         INSERT INTO tasks(name, state)
@@ -44,8 +43,8 @@ def addTask(conn):
     cursor.execute(sql, task)
     conn.commit()
 
-def listTasks(conn):
-    clearConsole()
+def list_tasks(conn):
+    clear_console()
     print("Current tasks:")
 
     sql = """
@@ -61,22 +60,22 @@ def listTasks(conn):
 
     input("Press Enter to continue...")
 
-def deleteTask(conn):
-    clearConsole()
-    listTasks(conn)
+def delete_task(conn):
+    clear_console()
+    list_tasks(conn)
 
     print("Select a task to delete: ")
-    taskId = input()
+    task_id = input()
 
     sql = """
         DELETE FROM tasks WHERE id = ?
     """
 
     cursor = conn.cursor()
-    cursor.execute(sql, taskId)
+    cursor.execute(sql, task_id)
     conn.commit()
 
-def initDatabase():
+def init_database():
     sql = [
         """
             CREATE TABLE IF NOT EXISTS tasks(
@@ -100,7 +99,7 @@ def initDatabase():
         print("Failed to open database:", e)
         return None
 
-def clearConsole():
+def clear_console():
     print("\033[H\033[J", end="")
 
 if __name__ == '__main__':
