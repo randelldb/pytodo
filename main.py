@@ -1,11 +1,16 @@
 import sqlite3
 
-
 def main():
     conn = init_database()
 
+    if conn is None:
+        return False
+
     while True:
-        menu(conn)
+        should_continue = menu(conn)
+        if not should_continue:
+            break
+        conn.close()
 
 def menu(conn):
     clear_console()
@@ -18,14 +23,18 @@ def menu(conn):
 
     if choice == "1":
         list_tasks(conn)
+        return None
     elif choice == "2":
         add_task(conn)
+        return None
     elif choice == "3":
         delete_task(conn)
+        return None
     elif choice == "X":
-        exit()
+        return False
     else:
         print("Faulty choice")
+        return None
 
 
 def add_task(conn):
@@ -43,36 +52,34 @@ def add_task(conn):
     cursor.execute(sql, task)
     conn.commit()
 
+    menu(conn)
+
 def list_tasks(conn):
     clear_console()
     print("Current tasks:")
 
-    sql = """
-        SELECT * FROM tasks
-    """
+    sql = "SELECT * FROM tasks"
 
     cursor = conn.cursor()
     cursor.execute(sql)
     rows = cursor.fetchall()
 
     for row in rows:
-        print(f"[{row[0]}] - {row[1]}")
+        print(f"[{row[0]}] - {strike(row[1])}")
 
     input("Press Enter to continue...")
+    menu(conn)
 
 def delete_task(conn):
-    clear_console()
     list_tasks(conn)
 
     print("Select a task to delete: ")
     task_id = input()
 
-    sql = """
-        DELETE FROM tasks WHERE id = ?
-    """
+    sql = "DELETE FROM tasks WHERE id = ?"
 
     cursor = conn.cursor()
-    cursor.execute(sql, task_id)
+    cursor.execute(sql, (task_id,))
     conn.commit()
 
 def init_database():
@@ -101,6 +108,13 @@ def init_database():
 
 def clear_console():
     print("\033[H\033[J", end="")
+
+def strike(text):
+    result = ''
+    for c in text:
+        result = result + c + '\u0336'
+    return result
+
 
 if __name__ == '__main__':
     main()
